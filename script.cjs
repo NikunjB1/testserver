@@ -5,9 +5,12 @@ require('dotenv').config(); // Load environment variables from .env file
 const KirkaJS = new KirkaModule();
 const MemberSchema = require('./dailylb.cjs');
 const fs = require('fs');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+app.use(cors());
 
 // Define the initialize function
 async function initialize() {
