@@ -7,7 +7,7 @@ const MemberSchema = require('./dailylb.cjs');
 const fs = require('fs');
 
 const app = express();
-const PORT = 8000;
+const PORT = process.env.PORT || 4000;
 
 // Define the initialize function
 async function initialize() {
