@@ -28,6 +28,14 @@ async function initialize() {
 }
 
 
+app.get('/test', async (req, res) => {
+  console.log('Endpoint /test hit');
+  let leaderboardJson;
+  let leaderboard;
+  leaderboardJson = JSON.stringify({Test: "pog"});
+  res.json(leaderboardJson);
+});
+
 async function autoUpdate(){
   const now = new Date();
   const hours = now.getHours();
@@ -42,9 +50,19 @@ async function autoUpdate(){
   //console.log(leaderboard);
 }
 
+async function pingTestEndpoint() {
+  try {
+    const response = await fetch('https://backend-api-2l08.onrender.com/test');
+  } catch (error) {
+    console.error('Error pinging test endpoint:', error.message);
+  }
+}
+
 initialize();
 autoUpdate();
+pingTestEndpoint();
 const interval2 = setInterval(autoUpdate, 5 * 60 * 1000); // 5 minutes in milliseconds
+const testPingInterval = setInterval(pingTestEndpoint, 5 * 60 * 1000);
 
 // Define the /dailylb endpoint
 app.get('/dailylb', async (req, res) => {
