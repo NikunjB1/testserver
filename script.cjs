@@ -37,10 +37,10 @@ app.get('/test', async (req, res) => {
 });
 
 async function autoUpdate(){
-  const now = new Date();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  if(hours === 23 && minutes >= 45){
+  let test = await KirkaJS.getSoloLeaderboard();
+  if(test.remainingTime == null)
+    return;
+  if(test.remainingTime <= (1800000/2)){
     let leaderboard = await KirkaJS.getClanLeaderboard();
     //convert leaderboard to json and write to lb.json
     let json = JSON.stringify(leaderboard);
