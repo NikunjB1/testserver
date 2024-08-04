@@ -91,6 +91,18 @@ app.get('/dailylb', async (req, res) => {
   res.json(leaderboardJson);
 });
 
+app.get('/pv', async (req, res) => {
+  const {id} = req.query;
+  console.log('Endpoint /pv hit');
+  let profile = await KirkaJS.getStatsLongID(id);
+  if(profile.id == null)
+      profile = JSON.stringify({error: 'No data found for this date'});
+  else
+      profile = JSON.stringify(profile);
+  
+  res.json(profile);
+});
+
 
 // Define the /clanlb endpoint
 app.get('/clanlb', async (req, res) => {
