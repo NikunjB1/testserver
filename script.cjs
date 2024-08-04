@@ -99,7 +99,6 @@ app.get('/pv', async (req, res) => {
       profile = JSON.stringify({error: 'No data found for this date'});
   else
       profile = JSON.stringify(profile);
-  console.log(profile);
   
   res.json(profile);
 });
