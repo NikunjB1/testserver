@@ -77,7 +77,7 @@ app.get('/dailylb', async (req, res) => {
   } else {
     let list  = await MemberSchema.find({date}).exec();
     if(list.length === 0){
-      leaderboardJson = JSON.stringify({error: 'No data found for this date'});
+      leaderboardJson = JSON.stringify({error: 'No data found for this date', response: list});
     }
     else{
       leaderboard = {results:[]};
@@ -96,7 +96,7 @@ app.get('/pv', async (req, res) => {
   console.log('Endpoint /pv hit');
   let profile = await KirkaJS.getStatsLongID(id);
   if(profile.id == null)
-      profile = JSON.stringify({error: 'Api Error'});
+      profile = JSON.stringify({error: 'Api Error', response: profile});
   else
       profile = JSON.stringify(profile);
   
@@ -108,7 +108,7 @@ app.get('/pvCheck', async (req, res) => {
   console.log('Endpoint /pvCheck hit');
   let profile = await KirkaJS.getStats(id);
   if(profile.id == null)
-      profile = JSON.stringify({error: 'Api Error'});
+      profile = JSON.stringify({error: 'Api Error', response: profile});
   else
       profile = JSON.stringify(profile);
   
@@ -121,7 +121,7 @@ app.get('/clanlb', async (req, res) => {
   console.log('Endpoint /clanlb hit');
   const leaderboard = await KirkaJS.getClanLeaderboard();
   if(leaderboard.results == null)
-      profile = JSON.stringify({error: 'Api Error'});
+      profile = JSON.stringify({error: 'Api Error', response: leaderboard});
   //read from lb.json
   let data = fs.readFileSync('lb.json');
   let leaderboardJson = JSON.parse(data);
@@ -141,6 +141,8 @@ app.get('/clanlb', async (req, res) => {
 app.get('/clan', async (req, res) => {
   console.log('Endpoint /clan hit');
   const leaderboard = await KirkaJS.getClanLeaderboard();
+  if(leaderboard.results == null)
+      return res.json(JSON.stringify({error: 'Api Error', response: leaderboard}));
   let leaderboardJsonString = JSON.stringify(leaderboard);
   res.json(leaderboardJsonString);
 });
