@@ -106,6 +106,7 @@ app.get('/pv', async (req, res) => {
 app.get('/pvCheck', async (req, res) => {
   const {id} = req.query;
   console.log('Endpoint /pvCheck hit');
+  console.log(id);
   let profile = await KirkaJS.getStats(id);
   if(profile.id == null)
       profile = JSON.stringify({error: 'Api Error', response: profile});
