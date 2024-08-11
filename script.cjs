@@ -96,7 +96,19 @@ app.get('/pv', async (req, res) => {
   console.log('Endpoint /pv hit');
   let profile = await KirkaJS.getStatsLongID(id);
   if(profile.id == null)
-      profile = JSON.stringify({error: 'No data found for this date'});
+      profile = JSON.stringify({error: 'Api Error'});
+  else
+      profile = JSON.stringify(profile);
+  
+  res.json(profile);
+});
+
+app.get('/pvCheck', async (req, res) => {
+  const {id} = req.query;
+  console.log('Endpoint /pvCheck hit');
+  let profile = await KirkaJS.getStats(id);
+  if(profile.id == null)
+      profile = JSON.stringify({error: 'Api Error'});
   else
       profile = JSON.stringify(profile);
   
@@ -108,6 +120,8 @@ app.get('/pv', async (req, res) => {
 app.get('/clanlb', async (req, res) => {
   console.log('Endpoint /clanlb hit');
   const leaderboard = await KirkaJS.getClanLeaderboard();
+  if(leaderboard.results == null)
+      profile = JSON.stringify({error: 'Api Error'});
   //read from lb.json
   let data = fs.readFileSync('lb.json');
   let leaderboardJson = JSON.parse(data);
@@ -119,6 +133,14 @@ app.get('/clanlb', async (req, res) => {
     }
     member.scoreDiff = member.scores - leaderboardJson.results.find(x => x.clanId === member.clanId).scores;
   }
+  let leaderboardJsonString = JSON.stringify(leaderboard);
+  res.json(leaderboardJsonString);
+});
+
+//Define the /clan endpoitn
+app.get('/clan', async (req, res) => {
+  console.log('Endpoint /clan hit');
+  const leaderboard = await KirkaJS.getClanLeaderboard();
   let leaderboardJsonString = JSON.stringify(leaderboard);
   res.json(leaderboardJsonString);
 });
