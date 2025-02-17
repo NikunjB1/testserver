@@ -5,7 +5,7 @@ require('dotenv').config(); // Load environment variables from .env file
 const KirkaJS = new KirkaModule();
 const MemberSchema = require('./dailylb.cjs');
 const fs = require('fs');
-const MemberSchema = require("./models/ClanMember Febuary");
+const MemberSchemav2 = require("./models/ClanMember Febuary");
 const cors = require('cors');
 
 const app = express();
@@ -124,7 +124,7 @@ app.get('/getDiscordID', async (req, res) => {
   let query = {
       longId: id,
     };
-  let profile = await MemberSchema.findOne(query);
+  let profile = await MemberSchemav2.findOne(query);
   
   res.json(profile);
 });
