@@ -5,7 +5,7 @@ require('dotenv').config(); // Load environment variables from .env file
 const KirkaJS = new KirkaModule();
 const MemberSchema = require('./dailylb.cjs');
 const fs = require('fs');
-const MemberSchemav2 = require("./models/ClanMember Febuary");
+const MemberSchemav2 = require("./ClanMember Febuary");
 const cors = require('cors');
 
 const app = express();
