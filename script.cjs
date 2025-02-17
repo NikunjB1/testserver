@@ -5,6 +5,7 @@ require('dotenv').config(); // Load environment variables from .env file
 const KirkaJS = new KirkaModule();
 const MemberSchema = require('./dailylb.cjs');
 const fs = require('fs');
+const MemberSchema = require("./models/ClanMember Febuary");
 const cors = require('cors');
 
 const app = express();
@@ -112,6 +113,18 @@ app.get('/pvCheck', async (req, res) => {
       profile = JSON.stringify({error: 'Api Error', response: profile});
   else
       profile = JSON.stringify(profile);
+  
+  res.json(profile);
+});
+
+app.get('/getDiscordID', async (req, res) => {
+  const {id} = req.query;
+  console.log('Endpoint /getDiscordID hit, LongId: ');
+  console.log(id);
+  let query = {
+      longId: id,
+    };
+  let profile = await MemberSchema.findOne(query);
   
   res.json(profile);
 });
