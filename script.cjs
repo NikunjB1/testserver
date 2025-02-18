@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const KirkaModule = require('kirkajs');
 require('dotenv').config(); // Load environment variables from .env file
+const { createCanvas } = require('canvas');
 const KirkaJS = new KirkaModule();
 const MemberSchema = require('./dailylb.cjs');
 const fs = require('fs');
@@ -27,6 +28,41 @@ async function initialize() {
     console.error(`Error: ${error}`);
   }
 }
+
+app.post('/generate-image', (req, res) => {
+  const { players, pageNumber } = req.body;
+  const PLAYERS_PER_PAGE = 15;
+
+  const canvas = createCanvas(800, PLAYERS_PER_PAGE * 60 + 20);
+  const ctx = canvas.getContext('2d');
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, '#000033');
+  gradient.addColorStop(1, '#000000');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 36px Arial';
+  ctx.fillText(`🏆 Leaderboard - Page ${pageNumber} 🏆`, 150, 60);
+
+  ctx.font = 'bold 20px Arial';
+  ctx.fillText('Rank', 200, 100);
+  ctx.fillText('Name', 400, 100);
+  ctx.fillText('KLO', 600, 100);
+
+  players.forEach((player, index) => {
+    const y = 140 + index * 50;
+    ctx.font = '18px Arial';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(`${index + 1}.`, 200, y);
+    ctx.fillText(player.name, 400, y);
+    ctx.fillText(player.klo.toString(), 600, y);
+  });
+
+  const buffer = canvas.toBuffer('image/png');
+  res.type('png').send(buffer);
+});
 
 
 app.get('/test', async (req, res) => {
