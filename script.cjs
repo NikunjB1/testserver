@@ -12,11 +12,11 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// app.use(cors({
-//   origin: ['https://zenos-hub.vercel.app', 'http://localhost:3000'],
-//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//   allowedHeaders: ['Content-Type', 'Authorization']
-// }));
+app.use(cors({
+   origin: ['https://zenos-hub.vercel.app', 'http://localhost:3000'],
+   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+   allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 
@@ -31,102 +31,7 @@ async function initialize() {
   }
 }
 
-app.post('/generate-image', (req, res) => {
-  const { players, pageNumber } = req.body;
-  const PLAYERS_PER_PAGE = 15;
 
-  const startIndex = (pageNumber - 1) * PLAYERS_PER_PAGE;
-  const pagePlayers = players.slice(startIndex, startIndex + PLAYERS_PER_PAGE);
-
-  const canvas = createCanvas(800, PLAYERS_PER_PAGE * 60 + 20);
-  const ctx = canvas.getContext("2d");
-
-  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0, "#000033");
-  gradient.addColorStop(1, "#000000");
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  const columns = {
-    rank: { x: 200, width: 100 },
-    name: { x: 400, width: 200 },
-    klo: { x: 600, width: 100 },
-  };
-
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 36px Arial";
-  const title = `🏆 VinK KLO Leaderboard - Page ${pageNumber} 🏆`;
-  const titleWidth = ctx.measureText(title).width;
-  ctx.fillText(title, (canvas.width - titleWidth) / 2, 60);
-
-  ctx.font = "bold 20px Arial";
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#ffffff";
-  ctx.fillText("Rank", columns.rank.x, 100);
-  ctx.fillText("Name", columns.name.x, 100);
-  ctx.fillText("KLO", columns.klo.x, 100);
-
-  ctx.beginPath();
-  ctx.strokeStyle = "#ffffff33";
-  ctx.lineWidth = 2;
-  ctx.moveTo(100, 110);
-  ctx.lineTo(canvas.width - 100, 110);
-  ctx.stroke();
-
-  ctx.font = "18px Arial";
-  pagePlayers.forEach((player, index) => {
-    const y = 140 + index * 50;
-    const globalRank = startIndex + index + 1;
-
-    let rankColor = "#ffffff";
-    let nameColor = "#00ffff";
-    let kloColor = "#ffffff";
-
-    // Special colors for top 3
-    if (globalRank === 1) {
-      rankColor = "#ffd700";
-      nameColor = "#ffd700";
-      kloColor = "#ffd700";
-    } else if (globalRank === 2) {
-      rankColor = "#c0c0c0";
-      nameColor = "#c0c0c0";
-      kloColor = "#c0c0c0";
-    } else if (globalRank === 3) {
-      rankColor = "#cd7f32";
-      nameColor = "#cd7f32";
-      kloColor = "#cd7f32";
-    }
-
-    ctx.fillStyle = rankColor;
-    ctx.fillText(`${globalRank}.`, columns.rank.x, y);
-
-    // Add player name with neon effect for top 3
-    ctx.fillStyle = nameColor;
-    if (globalRank <= 3) {
-      ctx.shadowColor = nameColor;
-      ctx.shadowBlur = 10;
-      ctx.fillText(player.name, columns.name.x, y);
-      ctx.shadowBlur = 0;
-    } else {
-      ctx.fillText(player.name, columns.name.x, y);
-    }
-
-    ctx.fillStyle = kloColor;
-    ctx.fillText(player.klo.toString(), columns.klo.x, y);
-
-    if (index < PLAYERS_PER_PAGE - 1) {
-      ctx.beginPath();
-      ctx.strokeStyle = "#ffffff11";
-      ctx.lineWidth = 1;
-      ctx.moveTo(100, y + 15);
-      ctx.lineTo(canvas.width - 100, y + 15);
-      ctx.stroke();
-    }
-  });
-
-  const buffer = canvas.toBuffer('image/png');
-  res.type('png').send(buffer);
-});
 
 
 app.get('/test', async (req, res) => {
