@@ -18,7 +18,7 @@ app.use(cors({
    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(express.json());
+
 
 // Define the initialize function
 async function initialize() {
