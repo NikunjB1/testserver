@@ -6,6 +6,7 @@ const KirkaJS = new KirkaModule();
 const MemberSchema = require("./dailylb.cjs");
 const fs = require("fs");
 const MemberSchemav2 = require("./ClanMember Febuary");
+const RenderDB = require("./renderdb.cjs");
 const cors = require("cors");
 
 const app = express();
@@ -21,14 +22,21 @@ app.use(
 
 let weeklyLeaderboard = [];
 async function cacheWeeklyLeaderboard() {
-  weeklyLeaderboard = [];
+  let weeklyLeaderboard2 = [];
   let startTime = Date.now();
-  let savedLb = fs.readFileSync("clanlb.json");
+  let query = await RenderDB.findOne({ id: "1" });
+  if (query == null) {
+    console.log("No saved leaderboard found");
+    return;
+  }
+  // console.log("Caching weekly leaderboard");
+  // console.log("Query: " + query);
+  let savedLb = query.clanlb;
   savedLb = JSON.parse(savedLb);
   let index = 0;
   let currentLb = await getClanLeaderboard();
   for (let clan of currentLb.results) {
-    console.log("Caching clan: " + clan);
+    // console.log("Caching clan: " + clan);
     index++;
     for (let member of clan.data.members) {
       let oldMember = findMemberInClan(savedLb, member.user.id);
@@ -39,23 +47,29 @@ async function cacheWeeklyLeaderboard() {
           obj.longId = member.user.id;
           obj.score = member.allScores;
           obj.clan = clan.name;
-          weeklyLeaderboard.push(obj);
+          weeklyLeaderboard2.push(obj);
         }
       } else {
         obj.name = oldMember.user.name;
         obj.longId = oldMember.user.id;
         obj.score = member.allScores - oldMember.allScores;
         obj.clan = clan.name;
-        weeklyLeaderboard.push(obj);
+        weeklyLeaderboard2.push(obj);
       }
     }
   }
   //sort weekly lb based on score
-  weeklyLeaderboard.sort((a, b) => b.score - a.score);
+  weeklyLeaderboard2.sort((a, b) => b.score - a.score);
   //get first 100 elements
-  weeklyLeaderboard = weeklyLeaderboard.slice(0, 100);
-  console.log(weeklyLeaderboard);
+  weeklyLeaderboard = weeklyLeaderboard2.slice(0, 100);
   console.log("Caching completed in " + (Date.now() - startTime) + "ms");
+
+  let timestamp = savedLb.timestamp;
+  let resetTime = timeUntilNextRun(timestamp);
+  if (resetTime <= 0) {
+    console.log("Resetting weekly leaderboard");
+    await saveClanLeaderboard();
+  }
 }
 
 function findMemberInClan(savedLb, longId) {
@@ -87,14 +101,24 @@ app.get("/test", async (req, res) => {
 
 app.get("/savedlb", async (req, res) => {
   console.log("Endpoint /savedlb hit");
-  let savedLb = fs.readFileSync("clanlb.json");
+  let query = await RenderDB.findOne({ id: "1" });
+  if (query == null) {
+    console.log("No saved leaderboard found");
+    return res.json(JSON.stringify({ error: "No saved leaderboard found" }));
+  }
+  let savedLb = query.clanlb;
   savedLb = JSON.parse(savedLb);
   res.json(savedLb);
 });
 
 app.get("/weeklylb", async (req, res) => {
   console.log("Endpoint /weeklylb hit");
-  let savedLb = fs.readFileSync("clanlb.json");
+  let query = await RenderDB.findOne({ id: "1" });
+  if (query == null) {
+    console.log("No saved leaderboard found");
+    return res.json(JSON.stringify({ error: "No saved leaderboard found" }));
+  }
+  let savedLb = query.clanlb;
   savedLb = JSON.parse(savedLb);
   let timestamp = savedLb.timestamp;
   let resetTime = timeUntilNextRun(timestamp);
@@ -106,7 +130,17 @@ app.get("/weeklylb", async (req, res) => {
 async function saveClanLeaderboard() {
   let leaderboard = await getClanLeaderboard();
   leaderboard.timestamp = Date.now();
-  fs.writeFileSync("clanlb.json", JSON.stringify(leaderboard));
+  let json = JSON.stringify(leaderboard);
+  let query = await RenderDB.findOne({ id: "1" });
+  if (query == null) {
+    query = new RenderDB({
+      id: "1",
+      clanlb: json,
+    });
+    await query.save();
+  } else {
+    await RenderDB.updateOne({ id: "1" }, { clanlb: json });
+  }
   console.log("Clan Leaderboard saved");
   await cacheWeeklyLeaderboard();
 }
@@ -133,7 +167,16 @@ async function autoUpdate() {
     let leaderboard = await KirkaJS.getClanLeaderboard();
     //convert leaderboard to json and write to lb.json
     let json = JSON.stringify(leaderboard);
-    fs.writeFileSync("lb.json", json);
+    let query = await RenderDB.findOne({ id: "1" });
+    if (query == null) {
+      query = new RenderDB({
+        id: "1",
+        lb: json,
+      });
+      await query.save();
+    } else {
+      await RenderDB.updateOne({ id: "1" }, { lb: json });
+    }
     console.log("Leaderboard updated");
   }
   //console.log(leaderboard);
@@ -150,19 +193,13 @@ async function pingTestEndpoint() {
 initialize();
 autoUpdate();
 pingTestEndpoint();
-saveClanLeaderboard();
+cacheWeeklyLeaderboard();
 const interval2 = setInterval(autoUpdate, 5 * 60 * 1000); // 5 minutes in milliseconds
 const testPingInterval = setInterval(pingTestEndpoint, 5 * 60 * 1000);
 const cacheWeeklyLbInterval = setInterval(
   cacheWeeklyLeaderboard,
   15 * 60 * 1000
 );
-
-const intervalTime = 7 * 24 * 60 * 60 * 1000; // 7 days
-
-const interval = setInterval(() => {
-  saveClanLeaderboard();
-}, intervalTime);
 
 function timeUntilNextRun(lastExecution) {
   let intervalTime = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -245,7 +282,12 @@ app.get("/clanlb", async (req, res) => {
   if (leaderboard.results == null)
     profile = JSON.stringify({ error: "Api Error", response: leaderboard });
   //read from lb.json
-  let data = fs.readFileSync("lb.json");
+  let query = await RenderDB.findOne({ id: "1" });
+  if (query == null) {
+    console.log("No saved leaderboard found");
+    return res.json(JSON.stringify({ error: "No saved leaderboard found" }));
+  }
+  let data = query.lb;
   let leaderboardJson = JSON.parse(data);
   for (let member of leaderboard.results) {
     //add a property to member called score diffrence
