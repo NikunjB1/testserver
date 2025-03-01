@@ -36,7 +36,7 @@ async function cacheWeeklyLeaderboard() {
   savedLb = JSON.parse(savedLb);
   let index = 0;
   let currentLb = await getClanLeaderboard();
-  console.log("currentLb: " + JSON.stringify(currentLb))
+  // console.log("currentLb: " + JSON.stringify(currentLb))
   for (let clan of currentLb.results) {
     // console.log("Caching clan: " + clan);
     index++;
