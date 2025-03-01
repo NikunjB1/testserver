@@ -22,6 +22,7 @@ app.use(
 
 let weeklyLeaderboard = [];
 async function cacheWeeklyLeaderboard() {
+  try{
   let weeklyLeaderboard2 = [];
   let startTime = Date.now();
   let query = await RenderDB.findOne({ id: "1" });
@@ -35,6 +36,7 @@ async function cacheWeeklyLeaderboard() {
   savedLb = JSON.parse(savedLb);
   let index = 0;
   let currentLb = await getClanLeaderboard();
+  console.log("currentLb: " + currentLb)
   for (let clan of currentLb.results) {
     // console.log("Caching clan: " + clan);
     index++;
@@ -69,6 +71,10 @@ async function cacheWeeklyLeaderboard() {
   if (resetTime <= 0) {
     console.log("Resetting weekly leaderboard");
     await saveClanLeaderboard();
+  }
+  }
+  catch(e){
+    return console.error("Error: " +  e);
   }
 }
 
