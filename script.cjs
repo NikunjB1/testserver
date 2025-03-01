@@ -157,8 +157,8 @@ async function getClanLeaderboard() {
     let clan = await KirkaJS.getClan(member.name);
     //wait 1 seconds
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    if (clan.reason) {
-      console.log("Error: " + clan.reason + "for clan: " + member.name);
+    if (clan.reason || clan.error) {
+      console.log("Error: " + (clan.reason || clan.error) + "for clan: " + member.name);
       continue;
     }
     member.data = clan;
