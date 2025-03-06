@@ -44,13 +44,13 @@ async function cacheWeeklyLeaderboard() {
       let oldMember = findMemberInClan(savedLb, member.user.id);
       let obj = {};
       if (oldMember == null) {
-        if (index <= 25) {
-          obj.name = member.user.name;
-          obj.longId = member.user.id;
-          obj.score = member.allScores;
-          obj.clan = clan.name;
-          weeklyLeaderboard2.push(obj);
-        }
+        // if (index <= 25) {
+        //   obj.name = member.user.name;
+        //   obj.longId = member.user.id;
+        //   obj.score = member.allScores;
+        //   obj.clan = clan.name;
+        //   weeklyLeaderboard2.push(obj);
+        // }
       } else {
         obj.name = oldMember.user.name;
         obj.longId = oldMember.user.id;
