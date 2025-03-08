@@ -266,7 +266,7 @@ async function getClanLeaderboard() {
 async function autoUpdate() {
   let test = await KirkaJS.getSoloLeaderboard();
   if (test.remainingTime == null) return;
-  if (test.remainingTime <= 18000 / 2) {
+  if (test.remainingTime <= 1800000 / 2) {
     let leaderboard = await KirkaJS.getClanLeaderboard();
     //convert leaderboard to json and write to lb.json
     let json = JSON.stringify(leaderboard);
