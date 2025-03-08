@@ -19,4 +19,4 @@ const RenderDB = new Schema({
   },
 });
 
-module.exports = model("RenderDB", RenderDB);
+module.exports = model("RenderDB2", RenderDB);
