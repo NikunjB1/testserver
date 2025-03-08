@@ -9,6 +9,10 @@ const RenderDB = new Schema({
     type: String,
     default: "",
   },
+  monthlylb: {
+    type: String,
+    default: "",
+  },
   lb: {
     type: String,
     default: "",
