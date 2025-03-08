@@ -201,7 +201,7 @@ app.get("/monthlylb", async (req, res) => {
   let savedLb = query.monthlylb;
   savedLb = JSON.parse(savedLb);
   let timestamp = savedLb.timestamp;
-  let resetTime = timeUntilNextRun(timestamp);
+  let resetTime = timeUntilNextRun2(timestamp);
   res.json(
     JSON.stringify({
       results: monthlyLeaderboard,
