@@ -90,7 +90,7 @@ async function cacheMonthlyLeaderboard(currentLb) {
     }
     // console.log("Caching weekly leaderboard");
     // console.log("Query: " + query);
-    let savedLb = query.clanlb;
+    let savedLb = query.monthlylb;
     savedLb = JSON.parse(savedLb);
     let index = 0;
     // console.log("currentLb: " + JSON.stringify(currentLb))
