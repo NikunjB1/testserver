@@ -241,9 +241,9 @@ async function saveClanLeaderboard2() {
     });
     await query.save();
   } else {
-    await RenderDB.updateOne({ id: "2" }, { clanlb: json });
+    await RenderDB.updateOne({ id: "2" }, { monthlylb: json });
   }
-  console.log("Clan Leaderboard saved");
+  console.log("Monthly Leaderboard saved");
 }
 
 async function getClanLeaderboard() {
