@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const March2025MemberSchema = new Schema({
+const April2025MemberSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -39,4 +39,4 @@ const March2025MemberSchema = new Schema({
   },
 });
 
-module.exports = model("March-2025-Member-List", March2025MemberSchema);
+module.exports = model("April-2025-Member-List", April2025MemberSchema);
