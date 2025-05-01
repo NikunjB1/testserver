@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const April2025MemberSchema = new Schema({
+const May2025MemberSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -37,6 +37,10 @@ const April2025MemberSchema = new Schema({
     type: Number,
     default: 0,
   },
+  other: {
+    type: Object,
+    default: {},
+  },
 });
 
-module.exports = model("April-2025-Member-List", April2025MemberSchema);
+module.exports = model("May-2025-Member-List", May2025MemberSchema);
